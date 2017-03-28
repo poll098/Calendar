@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.Collection;
 import java.util.Vector;
 
 import javax.swing.GroupLayout;
@@ -31,13 +30,9 @@ public class DMonth_dayPane extends JPanel implements MouseListener,ActionListen
 	private JLabel dayLabel=new JLabel();//day라벨
 	private String strDay;
 	
-	private JLabel ScheduleLabel=new JLabel();
-	private String []scheduleName;
+	private JLabel[] ScheduleLabel=new JLabel[4];
 	
-	private JLabel sc1 = new JLabel("dfse");
-	private JLabel sc2 = new JLabel("feee");
-	private JLabel sc3 = new JLabel("deeee");
-	private JLabel sc4 = new JLabel("dfefe");
+	private String scheduleName;
 	
 	private int year,month,day;
 	private JPopupMenu popup = new JPopupMenu();//오른쪽 마우스 클릭시 popupmenu
@@ -51,19 +46,29 @@ public class DMonth_dayPane extends JPanel implements MouseListener,ActionListen
 	
 	//해당 날짜의 데이터들만 받아와저장
 	private Vector <ScheduleData>Vec=new Vector<ScheduleData>();
+	
+
+	
 	public Vector<ScheduleData> getVec() {
 		return Vec;
+	}
+	public void setVec(Vector<ScheduleData> vec) {
+		Vec = vec;
 	}
 	
 	public DMonth_dayPane(DMonth_CalendarView calendar) {
 		
 		super();
+		for(int i=0;i<4;i++){
+			ScheduleLabel[i] = new JLabel();
+			}
 		this.calendar=calendar;
 		this.setOpaque(false);
 		
 		dayInfoPanel=new JPanel();
 		dayNumPanel=new JPanel();
 		dayNumPanel.setOpaque(false);
+		
 		schedulePanel=new JPanel();
 		schedulePanel.setLayout(new GridLayout(4,1));
 		schedulePanel.setOpaque(false);
@@ -120,7 +125,12 @@ public class DMonth_dayPane extends JPanel implements MouseListener,ActionListen
 	}
 	public void initInfo(){
 		dayLabel.setText("");
-		//Aday.add(dayLabel);
+
+		for(int i=0;i<ScheduleLabel.length;i++){
+		ScheduleLabel[i] . setHorizontalAlignment(JLabel.CENTER);
+		ScheduleLabel[i].setText("");
+		}
+	
 	}
 	/*각각의 day판넬에 날짜 지정하기*/
 	public void setValue(int year,int month,int day, int position){
@@ -145,26 +155,28 @@ public class DMonth_dayPane extends JPanel implements MouseListener,ActionListen
 		dayNumPanel.add(dayLabel,BorderLayout.WEST);
 	}
 	
-	public void setSchedule(ScheduleData sd){
+	public void setSchedule(ScheduleData sd){// 추가된 스케줄
 	//맨처음 array기존에 있는 데이터는 set JLabel에 4개전까지 크기[]
-		//add는 다
-		//Vec.removeAllElements();	//이거 왜 필요한지??
+			
 		Vec.add(sd);
-		//for(int i=0;i<Vec.size();i++){
-		//System.out.println( Vec.get(i).getScheduleName());
-		//}
-		System.out.println( Vec.size());
-		schedulePanel.add(sc1);
+		if(Vec.size()<4)	{//스케줄이 4이하일때
+			for(int i=0;i<Vec.size();i++){
+				ScheduleLabel[i].setText(Vec.get(i).getScheduleName());	
+				schedulePanel.add(ScheduleLabel[i]);		
+				}
+		  }
+		else{
+			for(int i=0;i<3;i++){
+				ScheduleLabel[i].setText(Vec.get(i).getScheduleName());	
+				schedulePanel.add(ScheduleLabel[i]);
+			}
+			ScheduleLabel[3].setText("...");
+			schedulePanel.add(ScheduleLabel[3]);	
+		}
 		
-		schedulePanel.add(sc2);
-		schedulePanel.add(sc3);
-		schedulePanel.add(sc4);
-		//ScheduleLabel.setLayout(new GridLayout(4,1));//최대 4개까지 보임
 		
-		//ScheduleLabel.setText(sd.getScheduleName());
-		//schedulePanel.add(ScheduleLabel);
-
-	}
+		
+		}
 	
 	public String getDate(){
 		return year+"/"+(month+1)+"/"+day;
@@ -279,10 +291,10 @@ class ShowDetail extends JDialog{
 		  String colNames[] = { "시간", "스케줄명"};  // Jtable 헤더는 1차원 배열
 		  DefaultTableModel model=new DefaultTableModel(colNames,0);
 		 
-		 System.out.println(Vec.size());
-		  for(int i=0;i<Vec.size();i++){
+		
+		  model.setNumRows(0);
+		  for(int i=0;i<Vec.size();i++){ 
 			   Vector<String> VecInfo=new Vector<String>();//Vec에서 시간과 스케줄명 가져와 row 벡터에 저장 시키고 model.addRow
-			  
 			   VecInfo.add(Vec.get(i).getTime());//시간 데이터
 			   VecInfo.add(Vec.get(i).getScheduleName());//스켖
 			  model.addRow(VecInfo);

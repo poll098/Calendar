@@ -34,18 +34,13 @@ public class DMonth_CalendarView extends JFrame implements ActionListener{
 	private JPanel MonthPanel;//월
 	private JLabel MonthLabel;
 	private JComboBox MonthCombo;
-	private String selectedMonth;
 	
 	DMonth_dayPane days[];//42개의 day설정
-	private JPanel DaysPanel;//일
 	private int year,month,today,lastday,startYoil;//년,월,일,달의 마지막일 ,시작요일
 	
-	private JButton Mypage_Button;
-	private JButton Friendgroup_Button;
-	private JButton Setting_Button;
-	private JButton Logout_Button;
 	private JButton TreeViewIcon;
 	private JButton weekBtn;
+	private JButton todayBtn;
 	private Vector <ScheduleData>scheduleVec=new Vector<ScheduleData>();
 	
 	public static final DMonth_CalendarView instance =new DMonth_CalendarView();
@@ -80,7 +75,6 @@ public class DMonth_CalendarView extends JFrame implements ActionListener{
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		setLocationRelativeTo(null);
 		contentPane.setLayout(null);
 		
 //현재 년,월
@@ -93,7 +87,7 @@ public class DMonth_CalendarView extends JFrame implements ActionListener{
 		contentPane.add(YearPanel);
 		YearPanel.setLayout(new BorderLayout(0, 0));
 				
-		JLabel YearLabel = new JLabel(year+"");
+		YearLabel = new JLabel(year+"");
 		YearLabel.setBorder(new LineBorder(Color.GRAY));
 		YearLabel.setBackground(Color.WHITE);
 		YearLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -172,7 +166,6 @@ public class DMonth_CalendarView extends JFrame implements ActionListener{
 //월
 		String[] DAY_OF_MONTH= {"1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"};
 		
-		ImageIcon treeIcon=new ImageIcon("image/ic_treeview_black_48dp_1x.png");
 		MonthCombo = new JComboBox(DAY_OF_MONTH);
 		MonthCombo.setSelectedIndex(month);
 		MonthCombo.setBounds(199, 44, 69, 21);
@@ -233,13 +226,14 @@ public class DMonth_CalendarView extends JFrame implements ActionListener{
 		}
 		changeDate();
 		contentPane.add(DaysPanel);
+		
+		ImageIcon treeIcon=new ImageIcon("image/ic_treeview_black_48dp_1x.png");
 		TreeViewIcon = new JButton(treeIcon);
 		TreeViewIcon.addActionListener(this);
 		TreeViewIcon.setBounds(1163, 17, 48, 48);
 		contentPane.add(TreeViewIcon);
 		
 		JPanel panel = new JPanel();
-		panel.setToolTipText("");
 		panel.setBackground(new Color(255, 192, 203));
 		panel.setBounds(0, 251, 137, 217);
 		contentPane.add(panel);
@@ -250,13 +244,32 @@ public class DMonth_CalendarView extends JFrame implements ActionListener{
 		panel.add(lblNewLabel);
 		
 		weekBtn = new JButton("Week");
-		weekBtn.setBounds(1054, 42, 97, 23);
+		weekBtn.setBounds(980, 42, 97, 23);
 		weekBtn.addActionListener(this);
 		contentPane.add(weekBtn);
 		
 		JButton msgBtn = new JButton("message");
 		msgBtn.setBounds(12, 618, 97, 23);
 		contentPane.add(msgBtn);
+		
+		todayBtn=new JButton("t");
+		todayBtn.setBounds(1100,17,48,48);
+		todayBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				year=now.get(Calendar.YEAR);
+				month=now.get(Calendar.MONTH);
+				YearLabel.setText(year+"");
+				MonthCombo.setSelectedIndex(month);
+				MonthLabel.setText(DAY_OF_MONTH[month]);
+				
+				changeDate();
+				
+			}
+		});
+		contentPane.add(todayBtn);
+		
 	}
 
 /*년 월 날짜 이동함수*/
@@ -285,13 +298,18 @@ public class DMonth_CalendarView extends JFrame implements ActionListener{
 					value=0;
 				else
 					value=cnt++;	
+				
 				days[i].initInfo();
 				days[i].setValue(year,month,value,i);//기본정보인 년/월/일 정보를 보내주고, 각 판넬에 day 위치 설정
+				
 				days[i].getVec().clear();//기존에 저장된 스케줄 초기화 시킨후 다시 받는다
+				
 				
 				for(int j=0;j<scheduleVec.size();j++){
 					ScheduleData sd=scheduleVec.get(j);
+				
 					if((year==sd.year)&&(month==sd.month-1)&&(value==sd.day)){
+						
 						days[i].setSchedule(sd);
 					}
 				}
@@ -306,6 +324,7 @@ public class DMonth_CalendarView extends JFrame implements ActionListener{
 		scheduleVec.add(scheduleData);
 		changeDate();//갱신
 	}
+	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		this.setVisible(false);
@@ -324,18 +343,6 @@ public class DMonth_CalendarView extends JFrame implements ActionListener{
 			// TODO Auto-generated method stub
 			return instance;
 		}
-	
-	public int getScheduleNum(){
-		return scheduleVec.size();
-	}
-	
-	public String getScheduleName(int index){
-		return scheduleVec.get(index).getScheduleName();
-	}
-	
-	public Vector getScheduleVec(){
-		return scheduleVec;
-	}
 }
 
 
